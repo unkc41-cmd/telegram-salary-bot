@@ -41,7 +41,28 @@ bot.on("callback_query", async (ctx) => {
     return ctx.reply("🆔 " + chatId);
   }
 
-  if (action === "salary") {
+if (action === "salary") {
+  const sheets = await sheetsClient();
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: "Лист1!A:C"
+  });
+
+  const rows = res.data.values || [];
+
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]).trim() === String(chatId).trim()) {
+      return ctx.reply(
+        "💰 ЗП: " + (rows[i][2] || "не вказана") + " грн"
+      );
+    }
+  }
+
+  return ctx.reply(
+    "❌ ID не знайдено.\nТвій ID: " + chatId
+  );
+}
     const sheets = await sheetsClient();
 
     const res = await sheets.spreadsheets.values.get({
